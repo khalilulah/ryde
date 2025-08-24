@@ -1,5 +1,4 @@
 import { ClerkProvider } from "@clerk/clerk-expo";
-import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import "react-native-reanimated";
@@ -20,9 +19,9 @@ export default function RootLayout() {
     // Async font loading only occurs in development.
     return null;
   }
-
+  // tokenCache={tokenCache}
   return (
-    <ClerkProvider tokenCache={tokenCache}>
+    <ClerkProvider>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />

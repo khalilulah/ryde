@@ -2,20 +2,48 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
-import { Link } from "expo-router";
+import { useSignIn } from "@clerk/clerk-expo";
+import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Alert, Image, Text, View } from "react-native";
 // import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native";
 
 const SignIn = () => {
+  const { signIn, setActive, isLoaded } = useSignIn();
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
   });
 
-  const onSignInPress = async () => {};
+  const onSignInPress = async () => {
+    if (!isLoaded) return;
+    const router = useRouter();
+    // Start the sign-in process using the email and password provided
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: form.email,
+        password: form.password,
+      });
+
+      // If sign-in process is complete, set the created session as active
+      // and redirect the user
+      if (signInAttempt.status === "complete") {
+        await setActive({ session: signInAttempt.createdSessionId });
+        router.replace("/");
+      } else {
+        // If the status isn't complete, check why. User might need to
+        // complete further steps.
+        console.error(JSON.stringify(signInAttempt, null, 2));
+      }
+    } catch (err: any) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      // console.error(JSON.stringify(err, null, 2));
+      Alert.alert("Error", err.errors[0].longMessage);
+    }
+  };
 
   return (
     <ScrollView
@@ -33,7 +61,7 @@ const SignIn = () => {
           {/* INPUT FIELDS */}
           <InputField
             label="Email"
-            placeholder="Enter your emial"
+            placeholder="Enter your email"
             icon={icons.email}
             value={form.email}
             onChangeText={(value) => setForm({ ...form, email: value })}
@@ -43,6 +71,7 @@ const SignIn = () => {
             placeholder="Enter your password"
             icon={icons.lock}
             value={form.password}
+            secureTextEntry={true}
             onChangeText={(value) => setForm({ ...form, password: value })}
           />
 

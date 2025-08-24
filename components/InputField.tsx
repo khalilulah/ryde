@@ -45,10 +45,10 @@ const InputField = ({
             <TextInput
               className={`rounded-full p-4 font-JakartaSemiBold text-[15px] flex-1 ${inputStyle} text-left`}
               placeholder={placeholder}
-              secureTextEntry={secureTextEntry}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               {...props}
+              secureTextEntry={secureTextEntry}
             />
           </View>
         </View>
