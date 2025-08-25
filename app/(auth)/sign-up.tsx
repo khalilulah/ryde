@@ -16,6 +16,7 @@ import ReactNativeModal from "react-native-modal";
 // import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native";
 
+import { fetchAPI } from "@/lib/fetch";
 import { useSignUp } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 
@@ -54,8 +55,6 @@ const SignUp = () => {
       // and capture OTP code
       setVerification({ ...verification, state: "pending" });
     } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
       Alert.alert("Error", err.errors[0].longMessage);
       // console.error(JSON.stringify(err, null, 2));
     }
@@ -74,10 +73,20 @@ const SignUp = () => {
       // If verification was completed, set the session to active
       // and redirect the user
       if (signUpAttempt.status === "complete") {
+        // data going back to the FETCHaPI
+        await fetchAPI("/(api)/user", {
+          method: "POST",
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            clerkId: signUpAttempt.createdUserId,
+          }),
+        });
+
         await setActive({ session: signUpAttempt.createdSessionId });
         setVerification({ ...verification, state: "success" });
-        router.push("/(root)/(tabs)/home");
-        // router.replace("/");
+        // router.push("/(root)/(tabs)/home");
+        router.replace("/");
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
