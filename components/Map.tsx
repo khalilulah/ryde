@@ -1,18 +1,68 @@
-import { calculateRegion } from "@/lib/map";
-import { useLocationStore } from "@/store/index"; // adjust path!
+import { calculateRegion, generateMarkersFromData } from "@/lib/map";
+import { useDriverStore, useLocationStore } from "@/store/index";
+import { MarkerData } from "@/types/type";
 import * as Location from "expo-location";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 
+const drivers = [
+  {
+    id: "1",
+    first_name: "James",
+    last_name: "Wilson",
+    profile_image_url:
+      "https://ucarecdn.com/dae59f69-2c1f-48c3-a883-017bcf0f9950/-/preview/1000x666/",
+    car_image_url:
+      "https://ucarecdn.com/a2dc52b2-8bf7-4e49-9a36-3ffb5229ed02/-/preview/465x466/",
+    car_seats: 4,
+    rating: "4.80",
+  },
+  {
+    id: "2",
+    first_name: "David",
+    last_name: "Brown",
+    profile_image_url:
+      "https://ucarecdn.com/6ea6d83d-ef1a-483f-9106-837a3a5b3f67/-/preview/1000x666/",
+    car_image_url:
+      "https://ucarecdn.com/a3872f80-c094-409c-82f8-c9ff38429327/-/preview/930x932/",
+    car_seats: 5,
+    rating: "4.60",
+  },
+  {
+    id: "3",
+    first_name: "Michael",
+    last_name: "Johnson",
+    profile_image_url:
+      "https://ucarecdn.com/0330d85c-232e-4c30-bd04-e5e4d0e3d688/-/preview/826x822/",
+    car_image_url:
+      "https://ucarecdn.com/289764fb-55b6-4427-b1d1-f655987b4a14/-/preview/930x932/",
+    car_seats: 4,
+    rating: "4.70",
+  },
+  {
+    id: "4",
+    first_name: "Robert",
+    last_name: "Green",
+    profile_image_url:
+      "https://ucarecdn.com/fdfc54df-9d24-40f7-b7d3-6f391561c0db/-/preview/626x417/",
+    car_image_url:
+      "https://ucarecdn.com/b6fb3b55-7676-4ff3-8484-fb115e268d32/-/preview/930x932/",
+    car_seats: 4,
+    rating: "4.90",
+  },
+];
+
 function MapComponent() {
-  console.log("🔄 Map component rendering...");
   const {
     userLatitude,
     userLongitude,
     destinationLongitude,
     destinationLatitude,
   } = useLocationStore();
+  const { selectedDriver, setDrivers } = useDriverStore();
+  const [markers, setMarkers] = useState<MarkerData[]>([]);
+
   const webViewRef = useRef<WebView>(null);
   const [webViewReady, setWebViewReady] = useState(false);
 
@@ -52,6 +102,39 @@ function MapComponent() {
     getLocation();
   }, []);
 
+  // Generate markers when drivers or user location changes
+  useEffect(() => {
+    if (Array.isArray(drivers)) {
+      if (!userLatitude || !userLongitude) return;
+
+      const newMarkers = generateMarkersFromData({
+        data: drivers,
+        userLongitude,
+        userLatitude,
+      });
+      setMarkers(newMarkers);
+    }
+  }, [drivers, userLatitude, userLongitude]);
+
+  // Send driver markers to WebView
+  useEffect(() => {
+    if (markers.length > 0 && webViewRef.current && webViewReady) {
+      console.log("🚗 Sending driver markers:", markers.length);
+      const message = JSON.stringify({
+        type: "updateDrivers",
+        markers: markers,
+        selectedDriverId: selectedDriver,
+      });
+
+      setTimeout(() => {
+        webViewRef.current?.injectJavaScript(`
+          window.dispatchEvent(new MessageEvent('message', { data: '${message}' }));
+          true;
+        `);
+      }, 100);
+    }
+  }, [markers, selectedDriver, webViewReady]);
+
   // Send updated location to WebView whenever store updates
   useEffect(() => {
     if (userLatitude && userLongitude && webViewRef.current && webViewReady) {
@@ -62,11 +145,10 @@ function MapComponent() {
         longitude: userLongitude,
       });
 
-      // Add a small delay to ensure WebView is ready
       setTimeout(() => {
         webViewRef.current?.injectJavaScript(`
           window.dispatchEvent(new MessageEvent('message', { data: '${message}' }));
-          true; // Required for React Native WebView
+          true;
         `);
       }, 100);
     }
@@ -94,13 +176,13 @@ function MapComponent() {
       setTimeout(() => {
         webViewRef.current?.injectJavaScript(`
           window.dispatchEvent(new MessageEvent('message', { data: '${message}' }));
-          true; // Required for React Native WebView
+          true;
         `);
       }, 100);
     }
   }, [destinationLatitude, destinationLongitude, webViewReady]);
 
-  // Static HTML (removed userLatitude, userLongitude from dependencies since they're not used in the HTML)
+  // Static HTML with driver markers support
   const leafletHTML = useMemo(
     () => `
     <!DOCTYPE html>
@@ -129,6 +211,17 @@ function MapComponent() {
           border-radius: 50%;
           box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
+        .driver-marker {
+          background-color: #34C759;
+          border: 2px solid white;
+          border-radius: 50%;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .driver-marker.selected {
+          background-color: #FF9500;
+          border: 3px solid white;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+        }
         .leaflet-control-container {
           pointer-events: auto;
         }
@@ -145,6 +238,7 @@ function MapComponent() {
         let map;
         let userMarker;
         let destinationMarker;
+        let driverMarkers = [];
         
         // Initialize map with region coordinates
         function initMap(lat, lng, zoom) {
@@ -195,38 +289,85 @@ function MapComponent() {
           
           userMarker = L.marker([lat, lng], { icon: userIcon })
             .addTo(map)
-            .bindPopup('You are here')
-            .openPopup();
+            .bindPopup('You are here');
           
           // Center map on user location
           map.setView([lat, lng], 13);
-          console.log('✅ User location updated');
+          
         }
         
         // Update destination on map
         function updateDestination(lat, lng) {
-          console.log('🎯 Updating destination:', lat, lng);
+         
           if (destinationMarker) {
             map.removeLayer(destinationMarker);
           }
           
           destinationMarker = L.marker([lat, lng])
             .addTo(map)
-            .bindPopup('Destination')
-            .openPopup();
+            .bindPopup('Destination');
           
           console.log('✅ Destination updated');
         }
         
+        // Clear existing driver markers
+        function clearDriverMarkers() {
+          driverMarkers.forEach(marker => {
+            map.removeLayer(marker);
+          });
+          driverMarkers = [];
+        }
+        
+        // Update driver markers on map
+        function updateDriverMarkers(markers, selectedDriverId) {
+          
+          
+          // Clear existing markers
+          clearDriverMarkers();
+          
+          markers.forEach(markerData => {
+            const isSelected = markerData.id === selectedDriverId;
+            const markerClass = isSelected ? 'driver-marker selected' : 'driver-marker';
+            
+            const driverIcon = L.divIcon({
+              className: markerClass,
+              iconSize: [16, 16],
+              iconAnchor: [8, 8]
+            });
+            
+            const marker = L.marker([markerData.latitude, markerData.longitude], { 
+              icon: driverIcon 
+            })
+            .addTo(map)
+            .bindPopup(markerData.title || 'Driver');
+            
+            // Add click handler for driver selection
+            marker.on('click', function() {
+              if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                  type: 'driverSelected',
+                  driverId: markerData.id
+                }));
+              }
+            });
+            
+            driverMarkers.push(marker);
+          });
+          
+         
+        }
+        
         // Listen for messages from React Native
         window.addEventListener('message', function(event) {
-          console.log('📨 Received message:', event.data);
+          
           const data = JSON.parse(event.data);
           
           if (data.type === 'updateLocation') {
             updateUserLocation(data.latitude, data.longitude);
           } else if (data.type === 'updateDestination') {
             updateDestination(data.latitude, data.longitude);
+          } else if (data.type === 'updateDrivers') {
+            updateDriverMarkers(data.markers, data.selectedDriverId);
           }
         });
         
@@ -238,16 +379,30 @@ function MapComponent() {
     </body>
     </html>
   `,
-    [region.latitude, region.longitude] // Only depend on region changes
+    [region.latitude, region.longitude]
   );
 
   // Handle WebView ready state
   const handleWebViewLoad = () => {
-    console.log("🌐 WebView loaded");
     setWebViewReady(true);
   };
 
-  // ✅ proper return
+  // Handle messages from WebView
+  const handleWebViewMessage = (event: any) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      console.log("📨 Message from WebView:", data);
+
+      if (data.type === "driverSelected") {
+        // Update selected driver in store
+        useDriverStore.getState().setSelectedDriver(data.driverId);
+      }
+    } catch (error) {
+      console.log("Error parsing WebView message:", error);
+    }
+  };
+
+  // Return loading state if region is not ready
   if (!region) {
     return (
       <View style={styles.container}>
@@ -265,15 +420,7 @@ function MapComponent() {
         javaScriptEnabled
         domStorageEnabled
         onLoad={handleWebViewLoad}
-        onMessage={(event) => {
-          // Handle messages from WebView (like map clicks)
-          try {
-            const data = JSON.parse(event.nativeEvent.data);
-            console.log("📨 Message from WebView:", data);
-          } catch (error) {
-            console.log("Error parsing WebView message:", error);
-          }
-        }}
+        onMessage={handleWebViewMessage}
       />
     </View>
   );

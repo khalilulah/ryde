@@ -1,17 +1,20 @@
-import GoogleTextInput from "@/components/GoogleTextInput";
+import GoogleTextInput, {
+  GoogleTextInputRef,
+} from "@/components/GoogleTextInput";
 import Map from "@/components/Map";
 import RideCard from "@/components/RideCard";
 import { icons, images } from "@/constants";
 import { useLocationStore } from "@/store";
 import { useUser } from "@clerk/clerk-expo";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -124,6 +127,7 @@ const recentRides = [
 ];
 
 export default function Page() {
+  const googleTextInputRef = useRef<GoogleTextInputRef>(null);
   const { user } = useUser();
   const loading = false;
   const { setDestinationLocation, setUserLocation } = useLocationStore();
@@ -149,6 +153,7 @@ export default function Page() {
           </TouchableOpacity>
         </View>
         <GoogleTextInput
+          ref={googleTextInputRef}
           icon={icons.search}
           containerStyle="bg-white shadow-md shadow-neutral-300"
           handlePress={handleDestinationPress}
@@ -168,32 +173,37 @@ export default function Page() {
   );
 
   return (
-    <SafeAreaView>
-      <FlatList
-        data={recentRides?.slice(0, 5)}
-        renderItem={({ item }) => <RideCard ride={item} />}
-        className="px-5"
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={flatListContentStyle}
-        ListEmptyComponent={() => (
-          <View className="flex flex-col items-center justify-center">
-            {!loading ? (
-              <>
-                <Image
-                  source={images.noResult}
-                  className=" flex w-40 h-40 self-center"
-                />
-                <Text>No recent ride found</Text>
-              </>
-            ) : (
-              <>
-                <ActivityIndicator size="small" />
-              </>
-            )}
-          </View>
-        )}
-        ListHeaderComponent={ListHeader}
-      />
-    </SafeAreaView>
+    <TouchableWithoutFeedback
+      onPress={() => googleTextInputRef.current?.hideResults()}
+    >
+      <SafeAreaView>
+        <FlatList
+          data={recentRides?.slice(0, 5)}
+          renderItem={({ item }) => <RideCard ride={item} />}
+          className="px-5"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={flatListContentStyle}
+          ListEmptyComponent={() => (
+            <View className="flex flex-col items-center justify-center">
+              {!loading ? (
+                <>
+                  <Image
+                    source={images.noResult}
+                    className=" flex w-40 h-40 self-center"
+                  />
+                  <Text>No recent ride found</Text>
+                </>
+              ) : (
+                <>
+                  <ActivityIndicator size="small" />
+                </>
+              )}
+            </View>
+          )}
+          ListHeaderComponent={ListHeader}
+        />
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
