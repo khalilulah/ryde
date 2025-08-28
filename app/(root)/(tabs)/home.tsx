@@ -14,7 +14,6 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -173,37 +172,35 @@ export default function Page() {
   );
 
   return (
-    <TouchableWithoutFeedback
-      onPress={() => googleTextInputRef.current?.hideResults()}
-    >
-      <SafeAreaView>
-        <FlatList
-          data={recentRides?.slice(0, 5)}
-          renderItem={({ item }) => <RideCard ride={item} />}
-          className="px-5"
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={flatListContentStyle}
-          ListEmptyComponent={() => (
-            <View className="flex flex-col items-center justify-center">
-              {!loading ? (
-                <>
-                  <Image
-                    source={images.noResult}
-                    className=" flex w-40 h-40 self-center"
-                  />
-                  <Text>No recent ride found</Text>
-                </>
-              ) : (
-                <>
-                  <ActivityIndicator size="small" />
-                </>
-              )}
-            </View>
-          )}
-          ListHeaderComponent={ListHeader}
-        />
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+    <SafeAreaView>
+      <FlatList
+        onScroll={() => googleTextInputRef.current?.hideResults()}
+        scrollEventThrottle={16}
+        data={recentRides?.slice(0, 5)}
+        renderItem={({ item }) => <RideCard ride={item} />}
+        className="px-5"
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={flatListContentStyle}
+        ListEmptyComponent={() => (
+          <View className="flex flex-col items-center justify-center">
+            {!loading ? (
+              <>
+                <Image
+                  source={images.noResult}
+                  className=" flex w-40 h-40 self-center"
+                />
+                <Text>No recent ride found</Text>
+              </>
+            ) : (
+              <>
+                <ActivityIndicator size="small" />
+              </>
+            )}
+          </View>
+        )}
+        ListHeaderComponent={ListHeader}
+      />
+    </SafeAreaView>
   );
 }
