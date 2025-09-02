@@ -92,10 +92,32 @@ function MapComponent() {
         longitude,
       });
 
+      // Build a more readable address by prioritizing street/city over name
+      const addressComponents = [];
+
+      // Add street number and name if available
+      if (address[0].streetNumber)
+        addressComponents.push(address[0].streetNumber);
+      if (address[0].street) addressComponents.push(address[0].street);
+
+      // If no street info, try subregion or district
+      if (addressComponents.length === 0) {
+        if (address[0].subregion) addressComponents.push(address[0].subregion);
+        else if (address[0].district)
+          addressComponents.push(address[0].district);
+      }
+
+      // Add city/region
+      if (address[0].city) addressComponents.push(address[0].city);
+      else if (address[0].region) addressComponents.push(address[0].region);
+
+      const readableAddress =
+        addressComponents.join(", ") || "Location not found";
+
       useLocationStore.getState().setUserLocation({
         latitude,
         longitude,
-        address: `${address[0].name || ""}, ${address[0].region || ""}`,
+        address: `${readableAddress}, ${address[0].region || ""}`,
       });
     };
 
@@ -104,6 +126,7 @@ function MapComponent() {
 
   // Generate markers when drivers or user location changes
   useEffect(() => {
+    setDrivers(drivers);
     if (Array.isArray(drivers)) {
       if (!userLatitude || !userLongitude) return;
 

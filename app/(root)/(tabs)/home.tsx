@@ -1,11 +1,12 @@
 import GoogleTextInput, {
   GoogleTextInputRef,
 } from "@/components/GoogleTextInput";
-import Map from "@/components/Map";
+import MapComponent from "@/components/Map";
 import RideCard from "@/components/RideCard";
 import { icons, images } from "@/constants";
 import { useLocationStore } from "@/store";
 import { useUser } from "@clerk/clerk-expo";
+import { router } from "expo-router";
 
 import React, { useCallback, useRef } from "react";
 import {
@@ -131,7 +132,14 @@ export default function Page() {
   const loading = false;
   const { setDestinationLocation, setUserLocation } = useLocationStore();
   const handleSignOut = useCallback(() => {}, []);
-  const handleDestinationPress = useCallback(() => {}, []);
+  const handleDestinationPress = (location: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  }) => {
+    setDestinationLocation(location);
+    router.push("/(root)/find-ride");
+  };
   const flatListContentStyle = { paddingBottom: 100 };
 
   const ListHeader = useCallback(
@@ -162,7 +170,7 @@ export default function Page() {
             Current Location
           </Text>
           <View className="flex flex-row items-center bg-transparent h-[300px]">
-            <Map />
+            <MapComponent />
           </View>
         </>
         <Text className="text-xl font-JakartaBold mt-5 mb-3">Recent Rides</Text>

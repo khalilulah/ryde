@@ -18,6 +18,7 @@
       }
     },
     "android": {
+      "softwareKeyboardLayoutMode": "adjustResize",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyCziy3e304C8Xxz4hWNh90IHY-5K0LKziE"

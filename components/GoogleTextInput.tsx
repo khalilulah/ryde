@@ -104,7 +104,7 @@ const GoogleTextInput = forwardRef(
               backgroundColor: textInputBackgroundColor || "white",
               borderRadius: 10,
               maxHeight: 300,
-              zIndex: 99,
+              zIndex: 1,
             }}
             renderItem={({ item }) => (
               <TouchableOpacity
