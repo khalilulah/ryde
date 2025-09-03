@@ -62,10 +62,6 @@ declare interface ButtonProps extends TouchableOpacityProps {
   className?: string;
 }
 
-declare interface PaymentProps {
-  amount: number;
-}
-
 declare interface GoogleInputProps {
   icon?: string;
   initialLocation?: string;
@@ -94,13 +90,11 @@ declare interface InputFieldProps extends TextInputProps {
   className?: string;
 }
 
-// declare interface PaymentProps {
-//   fullName: string;
-//   email: string;
-//   amount: string;
-//   driverId: number;
-//   rideTime: number;
-// }
+declare interface PaymentProps {
+  amount: number;
+  driverId: number;
+  rideTime: number;
+}
 
 declare interface LocationStore {
   userLatitude: number | null;
