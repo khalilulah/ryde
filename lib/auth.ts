@@ -2,6 +2,7 @@ import * as Linking from "expo-linking";
 import { fetchAPI } from "./fetch";
 
 export const googleOAuth = async (startOAuthFlow: any) => {
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
   try {
     const { createdSessionId, setActive, signUp } = await startOAuthFlow({
       redirectUrl: Linking.createURL("/(root)/(tabs)/home"),
@@ -12,7 +13,7 @@ export const googleOAuth = async (startOAuthFlow: any) => {
         await setActive({ session: createdSessionId });
 
         if (signUp.createdUserId) {
-          await fetchAPI("/(api)/user", {
+          await fetchAPI(`${API_URL}/(api)/user`, {
             method: "POST",
             body: JSON.stringify({
               name: `${signUp.firstName} ${signUp.lastName}`,

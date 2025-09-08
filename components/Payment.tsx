@@ -18,10 +18,10 @@ const Payment = ({ amount, driverId, rideTime }: PaymentProps) => {
     destinationLongitude,
   } = useLocationStore();
   const { userId } = useAuth();
-
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const createRide = async () => {
     try {
-      const response = await fetchAPI("/(api)/ride/create", {
+      const response = await fetchAPI(`${API_URL}/(api)/ride/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,0 +1,51 @@
+{
+  "cli": {
+    "version": ">= 16.18.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "DATABASE_URL": "@database_url",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "@expo_public_clerk_publishable_key",
+        "EXPO_PUBLIC_SERVER_URL": "@expo_public_server_url",
+        "EXPO_PUBLIC_GEOAPIFY_API_KEY": "@expo_public_geoapify_api_key",
+        "EXPO_PUBLIC_API_URL": "@expo_public_api_url"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "DATABASE_URL": "@database_url",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "@expo_public_clerk_publishable_key",
+        "EXPO_PUBLIC_SERVER_URL": "@expo_public_server_url",
+        "EXPO_PUBLIC_GEOAPIFY_API_KEY": "@expo_public_geoapify_api_key",
+        "EXPO_PUBLIC_API_URL": "@expo_public_api_url"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "DATABASE_URL": "@database_url",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "@expo_public_clerk_publishable_key",
+        "EXPO_PUBLIC_SERVER_URL": "@expo_public_server_url",
+        "EXPO_PUBLIC_GEOAPIFY_API_KEY": "@expo_public_geoapify_api_key",
+        "EXPO_PUBLIC_API_URL": "@expo_public_api_url"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

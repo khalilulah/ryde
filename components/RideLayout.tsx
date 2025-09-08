@@ -43,6 +43,7 @@ const RideLayout = ({
 
           {/* Map Component */}
           <MapComponent />
+          <Text>Map temporarily disabled for testing</Text>
 
           {/* Bottom Sheet - now properly positioned */}
           {/* <BottomSheet

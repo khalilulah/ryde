@@ -20,11 +20,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 LogBox.ignoreLogs(["Clerk:"]);
+LogBox.ignoreLogs(["search error:"]);
 export default function Page() {
   const googleTextInputRef = useRef<GoogleTextInputRef>(null);
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const { user } = useUser();
   const { signOut } = useAuth();
-  const { data: recentRides, loading } = useFetch(`/(api)/ride/${user?.id}`);
+  const { data: recentRides, loading } = useFetch(
+    `${API_URL}/(api)/ride/${user?.id}`
+  );
   const { setDestinationLocation, setUserLocation } = useLocationStore();
   const handleSignOut = () => {
     signOut();

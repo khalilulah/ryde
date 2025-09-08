@@ -23,7 +23,7 @@ import { useRouter } from "expo-router";
 const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
-
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const [verification, setVerification] = useState({
     state: "default",
     error: "",
@@ -74,7 +74,7 @@ const SignUp = () => {
       // and redirect the user
       if (signUpAttempt.status === "complete") {
         // data going back to the FETCHaPI
-        await fetchAPI("/(api)/user", {
+        await fetchAPI(`${API_URL}/(api)/user`, {
           method: "POST",
           body: JSON.stringify({
             name: form.name,

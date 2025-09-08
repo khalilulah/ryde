@@ -12,7 +12,12 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 
 function MapComponent() {
-  const { data: drivers, loading, error } = useFetch<Driver[]>("/(api)/driver");
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
+  const {
+    data: drivers,
+    loading,
+    error,
+  } = useFetch<Driver[]>(`${API_URL}/(api)/driver`);
   const {
     userLatitude,
     userLongitude,

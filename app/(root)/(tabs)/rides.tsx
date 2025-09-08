@@ -9,12 +9,12 @@ import { Ride } from "@/types/type";
 
 const Rides = () => {
   const { user } = useUser();
-
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const {
     data: recentRides,
     loading,
     error,
-  } = useFetch<Ride[]>(`/(api)/ride/${user?.id}`);
+  } = useFetch<Ride[]>(`${API_URL}/(api)/ride/${user?.id}`);
 
   return (
     <SafeAreaView className="flex-1 bg-white">

@@ -18,7 +18,7 @@
       }
     },
     "android": {
-      "softwareKeyboardLayoutMode": "adjustResize",
+      "softwareKeyboardLayoutMode": "resize",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyCziy3e304C8Xxz4hWNh90IHY-5K0LKziE"
@@ -29,7 +29,8 @@
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
+      "package": "com.khalilll.uberr"
     },
     "web": {
       "bundler": "metro",
@@ -40,7 +41,7 @@
       [
         "expo-router",
         {
-          "origin": "https://uber.com/"
+          "origin": "https://uberr.expo.app"
         }
       ],
       [
@@ -55,6 +56,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "22ea2224-4336-4c5d-aeba-d6c9510d4b75"
+      }
     }
   }
 }

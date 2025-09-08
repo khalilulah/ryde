@@ -4,6 +4,8 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import "react-native-reanimated";
 import "./../global.css";
+const publishableKey =
+  "pk_test_dmlhYmxlLWdhdG9yLTQ4LmNsZXJrLmFjY291bnRzLmRldiQ";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -22,7 +24,7 @@ export default function RootLayout() {
   }
   // tokenCache={tokenCache}
   return (
-    <ClerkProvider tokenCache={tokenCache}>
+    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
