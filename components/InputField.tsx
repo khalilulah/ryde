@@ -1,3 +1,6 @@
+import { InputFieldProps } from "@/types/type";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   Image,
   Keyboard,
@@ -5,12 +8,10 @@ import {
   Platform,
   Text,
   TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-
-import { InputFieldProps } from "@/types/type";
-import { useState } from "react";
 
 const InputField = ({
   labelStyle,
@@ -24,6 +25,7 @@ const InputField = ({
   className,
   ...props
 }: InputFieldProps) => {
+  const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   return (
     <KeyboardAvoidingView
@@ -48,8 +50,20 @@ const InputField = ({
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               {...props}
-              secureTextEntry={secureTextEntry}
+              secureTextEntry={showPassword}
             />
+            {secureTextEntry && (
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={{ padding: 8 }}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-outline" : "eye-off-outline"}
+                  size={20}
+                  color="#000"
+                />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </TouchableWithoutFeedback>

@@ -77,6 +77,7 @@ const GoogleTextInput = forwardRef(
           />
           <TextInput
             value={query}
+            numberOfLines={1}
             onChangeText={(text) => {
               setQuery(text);
               searchPlaces(text);
@@ -88,6 +89,7 @@ const GoogleTextInput = forwardRef(
               fontSize: 16,
               fontWeight: "600",
               paddingVertical: 15,
+              lineHeight: 25,
             }}
           />
         </View>

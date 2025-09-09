@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import React, { useCallback, useRef } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
   LogBox,
@@ -30,10 +31,22 @@ export default function Page() {
     `${API_URL}/(api)/ride/${user?.id}`
   );
   const { setDestinationLocation, setUserLocation } = useLocationStore();
+
   const handleSignOut = () => {
     signOut();
-    router.replace("/(auth)/sign-in");
+
+    setTimeout(() => {
+      router.replace("/(auth)/sign-in");
+    }, 1000);
   };
+
+  const confirmLogout = () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Logout", onPress: () => handleSignOut(), style: "destructive" },
+    ]);
+  };
+
   const handleDestinationPress = (location: {
     latitude: number;
     longitude: number;
@@ -50,12 +63,10 @@ export default function Page() {
         <View className="flex flex-row items-center justify-between my-5">
           <Text className="text-2xl font-JakartaExtraBold capitalize">
             Welcome,{"  "}
-            {user?.firstName ||
-              user?.emailAddresses[0].emailAddress.split("@")[0]}{" "}
-            👋
+            {user?.firstName} 👋
           </Text>
           <TouchableOpacity
-            onPress={handleSignOut}
+            onPress={confirmLogout}
             className="justify-center items-center w-10 h-10 rounded-full bg-white"
           >
             <Image source={icons.out} className="w-4 h-4" />

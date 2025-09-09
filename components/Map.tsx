@@ -186,20 +186,6 @@ function MapComponent() {
     }
   }, [destinationLatitude, destinationLongitude, webViewReady]);
 
-  // if (loading || (!userLatitude && !userLongitude))
-  //   return (
-  //     <View className="flex justify-between items-center w-full">
-  //       <ActivityIndicator size="small" color="#000" />
-  //     </View>
-  //   );
-
-  // if (error)
-  //   return (
-  //     <View className="flex justify-between items-center w-full">
-  //       <Text>Error: {error}</Text>
-  //     </View>
-  //   );
-  // Static HTML with driver markers support
   const leafletHTML = useMemo(
     () => `
     <!DOCTYPE html>

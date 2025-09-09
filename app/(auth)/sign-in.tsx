@@ -12,14 +12,15 @@ import { ScrollView } from "react-native";
 const SignIn = () => {
   const { signIn, setActive, isLoaded } = useSignIn();
   const [form, setForm] = useState({
-    name: "",
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const onSignInPress = async () => {
     if (!isLoaded) return;
-    const router = useRouter();
+    setLoading(true);
     // Start the sign-in process using the email and password provided
     try {
       const signInAttempt = await signIn.create({
@@ -42,6 +43,8 @@ const SignIn = () => {
       // for more info on error handling
       // console.error(JSON.stringify(err, null, 2));
       Alert.alert("Error", err.errors[0].longMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,11 +78,12 @@ const SignIn = () => {
             onChangeText={(value) => setForm({ ...form, password: value })}
           />
 
-          {/* SIGNUP BUTTON */}
+          {/* SIGNin BUTTON */}
           <CustomButton
-            title="Log In"
+            title={loading ? "Signing In..." : "Log In"}
             onPress={onSignInPress}
             className="mt-6"
+            disabled={loading}
           />
           {/* OAUTH */}
           <OAuth />

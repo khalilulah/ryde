@@ -37,10 +37,11 @@ const SignUp = () => {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
-
+    setLoading(true);
     // Start sign-up process using email and password provided
     try {
       await signUp.create({
@@ -57,6 +58,8 @@ const SignUp = () => {
     } catch (err: any) {
       Alert.alert("Error", err.errors[0].longMessage);
       // console.error(JSON.stringify(err, null, 2));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -167,9 +170,10 @@ const SignUp = () => {
 
             {/* SIGNUP BUTTON */}
             <CustomButton
-              title="Sign Up"
+              title={loading ? "Signing Up..." : "Sign Up"}
               onPress={onSignUpPress}
               className="mt-6"
+              disabled={loading}
             />
             {/* OAUTH */}
             <OAuth />
